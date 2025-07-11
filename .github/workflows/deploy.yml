@@ -27,10 +27,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'  # 使用 npm 缓存
+          cache: npm  # 使用 npm 缓存
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v4
 
       - name: Install dependencies with npm
         run: npm install  # 使用 npm 安装依赖
