@@ -6,7 +6,7 @@
 
 电脑端首页界面：
 
-![image-20250513163414455](./images/image-20250513163414455.png)
+![image-20250513163414455](./images/image-shouye.png)
 
 电脑端具体笔记界面：
 
@@ -14,5 +14,6 @@
 
 手机端首页和具体笔记界面：
 
-![image-20250513164055132](./images/image-20250513164055132.png)![image-20250513164145146](./images/image-20250513164145146.png)
+![image-20250513164055132](./images/image-phoneshouye.png)
+![image-20250513164145146](./images/image-20250513164145146.png)
 
