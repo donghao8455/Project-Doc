@@ -41,7 +41,7 @@ function goTo(url) {
 <style>
 /* 颜色类 */
 .color-pink {
-    background: #90f;
+    background: #70c5d3;
 }
 
 .color-red {
