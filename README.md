@@ -10,10 +10,11 @@
 
 电脑端具体笔记界面：
 
-![image-20250513163454603](./images/image-20250513163454603.png)
+![image-20250513163454603](./images/image-pages.png)
 
 手机端首页和具体笔记界面：
 
 ![image-20250513164055132](./images/image-phoneshouye.png)
-![image-20250513164145146](./images/image-20250513164145146.png)
+
+![image-20250513164145146](./images/image-phonepages.png)
 
