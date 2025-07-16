@@ -16,6 +16,12 @@ hero:
     - theme: alt
       text: 笔记更新历程
       link: /笔记更新历程.md
+    - theme: brand
+      text: Java面试
+      link: /E_Java面试宝典/基本概念
+    - theme: alt
+      text: AI大模型开发
+      link: /AI大模型开发.md
       
 features:
   - title: 不断更新
