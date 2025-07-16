@@ -635,13 +635,14 @@ export default {
                 { text: '插件拓展', link: '/T_VSCode/插件拓展' },
                 { text: '快捷键', link: '/T_VSCode/快捷键' },
                 { text: '使用积累', link: '/T_VSCode/使用积累' },
+                { text: '疑难杂症', link: '/T_VSCode/疑难杂症' },
             ]
         }
     ],
 
     /**
      * 经验积累部分
-     * 包括Java后端学习规划、Vue项目配置问题、Web开发环境搭建、面试问题积累、开发积累（按照首编写时间排序）
+     * 包括Java后端学习规划、Vue项目配置问题、Web开发环境搭建、Java面试宝典、开发积累（按照首编写时间排序）
      */
     '/E_Vue项目配置问题/': [
         {
@@ -663,12 +664,13 @@ export default {
             ]
         }
     ],
-    '/E_面试问题积累/': [
+    '/E_Java面试宝典/': [
         {
-            text: '面试问题积累',
+            text: 'Java面试宝典',
             items: [
-                { text: '基本概念', link: '/E_面试问题积累/基本概念' },
-                { text: '基础性问题', link: '/E_面试问题积累/基础性问题' },
+                { text: '基本概念', link: '/E_Java面试宝典/基本概念' },
+                { text: '基础性问题', link: '/E_Java面试宝典/基础性问题' },
+                { text: '管理岗问题', link: '/E_Java面试宝典/管理岗问题' },
             ]
         }
     ],
