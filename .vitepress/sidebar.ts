@@ -670,6 +670,10 @@ export default {
             items: [
                 { text: '基本概念', link: '/E_Java面试宝典/基本概念' },
                 { text: '基础性问题', link: '/E_Java面试宝典/基础性问题' },
+                { text: 'Java基础', link: '/E_Java面试宝典/Java基础' },
+                { text: 'JVM', link: '/E_Java面试宝典/JVM' },
+                { text: '框架源码', link: '/E_Java面试宝典/框架源码' },
+                { text: '根据简历提问题', link: '/E_Java面试宝典/根据简历提问题' },
                 { text: '管理岗问题', link: '/E_Java面试宝典/管理岗问题' },
             ]
         }
