@@ -1207,3 +1207,506 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 
 
 **考察点**：线程池的底层理解、场景化设计能力、风险控制意识、实战调优经验。
+
+## 常用的导入注解类 @Import@ImportResource@ContextConfiguration@PropertySource
+要理解Spring里这些注解，咱们可以从“Spring如何找配置、装东西”这个核心问题入手。这些注解本质上都是告诉Spring：“喂，我这儿有你需要的配置/资源，赶紧加载进来！” 下面用大白话逐个拆解：
+
+
+### 一、@Import：导入Java配置类，让多个配置“合并”
+**作用**：当你用Java代码写配置（比如带@Configuration的类）时，用@Import可以把其他配置类“拉进来”，让Spring一次性加载所有配置里的Bean。
+
+**场景**：项目大了，配置类可能按功能拆分（比如用户相关的UserConfig、订单相关的OrderConfig），总不能让Spring一个个找吧？用@Import就能把它们“打包”加载。
+
+**用法**：
+```java
+// 子配置类1：用户相关Bean
+@Configuration
+public class UserConfig {
+    @Bean
+    public UserService userService() {
+        return new UserService();
+    }
+}
+
+// 子配置类2：订单相关Bean
+@Configuration
+public class OrderConfig {
+    @Bean
+    public OrderService orderService() {
+        return new OrderService();
+    }
+}
+
+// 主配置类：用@Import把上面两个“合并”
+@Configuration
+@Import({UserConfig.class, OrderConfig.class}) // 直接指定要导入的配置类
+public class MainConfig {
+    // 这里可以再加一些主配置的Bean
+}
+```
+这样Spring加载MainConfig时，会自动把UserConfig和OrderConfig里的Bean（UserService、OrderService）也一起加载进来。
+
+
+### 二、@ImportResource：导入XML配置文件，兼容老项目
+**作用**：如果你的项目里还有老的XML配置文件（比如以前用`<bean>`标签定义的Bean），用@ImportResource告诉Spring去加载这些XML。
+
+**场景**：新项目用Java注解配置，但需要兼容老项目的XML配置（比如一些第三方框架的配置只能写在XML里），就用它“桥接”一下。
+
+**用法**：
+假设有个`old-beans.xml`文件，里面定义了一个Bean：
+```xml
+<!-- src/main/resources/old-beans.xml -->
+<beans xmlns="http://www.springframework.org/schema/beans">
+    <bean id="legacyService" class="com.xxx.LegacyService"/>
+</beans>
+```
+在配置类里用@ImportResource导入：
+```java
+@Configuration
+@ImportResource("classpath:old-beans.xml") // 指定XML路径（classpath表示从资源目录找）
+public class MainConfig {
+    // 这里的配置 + XML里的legacyService，Spring都会加载
+}
+```
+
+
+### 三、@ContextConfiguration：测试时指定配置，让测试类“有环境”
+**作用**：写单元测试时，Spring需要知道用哪些配置来创建容器（不然测试类里@Autowired的Bean会找不到）。@ContextConfiguration就是告诉测试类：“用这些配置来启动Spring容器”。
+
+**场景**：比如测试UserService，需要先让Spring加载UserConfig里的UserService Bean，否则测试时会报“找不到Bean”的错。
+
+**用法**：
+```java
+// 测试类
+@SpringBootTest
+// 指定用哪个配置类/XML来启动Spring容器
+@ContextConfiguration(classes = {UserConfig.class}, locations = "classpath:old-beans.xml")
+public class UserServiceTest {
+    @Autowired
+    private UserService userService; // 现在能正常注入了
+    
+    @Test
+    public void test() {
+        userService.doSomething(); // 可以正常测试了
+    }
+}
+```
+- `classes`：指定Java配置类（和@Import的参数类似）
+- `locations`：指定XML配置文件（和@ImportResource的参数类似）
+
+
+### 四、@PropertySource：加载属性文件，让配置“动态可变”
+**作用**：把.properties或.yml文件里的配置（比如数据库地址、端口号）加载到Spring里，方便在代码中用@Value获取，避免硬编码。
+
+**场景**：数据库的url、密码肯定不能写死在代码里，放在`application.properties`里，用@PropertySource加载后，代码里就能动态读取。
+
+**用法**：
+假设有个`db.properties`：
+```properties
+# src/main/resources/db.properties
+db.url=jdbc:mysql://localhost:3306/test
+db.username=root
+db.password=123456
+```
+在配置类里加载并使用：
+```java
+@Configuration
+@PropertySource("classpath:db.properties") // 加载属性文件
+public class DbConfig {
+    // 用@Value获取属性值（${key}对应properties里的key）
+    @Value("${db.url}")
+    private String url;
+    
+    @Value("${db.username}")
+    private String username;
+    
+    @Bean
+    public DataSource dataSource() {
+        // 用上面的属性创建数据源，避免硬编码
+        return new DruidDataSource(url, username, ...);
+    }
+}
+```
+
+
+### 总结：这些注解的核心区别
+- **@Import**：导入Java配置类（.class），解决多个配置类的合并问题。
+- **@ImportResource**：导入XML配置文件（.xml），解决老配置的兼容问题。
+- **@ContextConfiguration**：测试专用，告诉测试类“用什么配置启动Spring”。
+- **@PropertySource**：导入属性文件（.properties），解决配置动态化（避免硬编码）。
+
+它们的目标一致：让Spring能找到并加载所有需要的配置，最终创建出我们需要的Bean。
+
+## java面试过程中，强引用和弱引用，会有哪些面试题
+在Java面试中，强引用、弱引用（以及软引用、虚引用）是常见考点，相关面试题主要围绕定义、区别、使用场景等展开，以下是常见问题及核心要点：
+
+
+### 1. 请解释什么是强引用、弱引用？它们的区别是什么？
+- **强引用**：最普通的引用（如`Object obj = new Object()`），只要强引用存在，被引用的对象就不会被GC回收，即使内存不足也会抛出`OutOfMemoryError`。
+- **弱引用**：通过`WeakReference`类实现，引用的对象在GC时**只要被扫描到**，就会被回收（无论内存是否充足）。
+- **核心区别**：强引用会阻止对象被回收，弱引用不会，对象是否被回收仅取决于GC是否触发。
+
+
+### 2. 弱引用的使用场景有哪些？
+- 典型场景是缓存，例如：
+  - 当内存充足时，缓存对象可暂时保留；
+  - 当内存不足触发GC时，缓存对象可被回收，避免OOM。
+- 常见例子：`WeakHashMap`，其key使用弱引用，当key被回收后，对应的entry会自动从map中移除。
+
+
+### 3. 如何在代码中创建弱引用？
+- 通过`java.lang.ref.WeakReference`类创建：
+  ```java
+  Object obj = new Object();
+  WeakReference<Object> weakRef = new WeakReference<>(obj);
+  // 获取引用的对象（可能为null，需判断）
+  Object referent = weakRef.get();
+  ```
+- 注意：若同时存在强引用指向对象，弱引用的`get()`仍能获取对象，直到强引用被移除。
+
+
+### 4. 强引用、弱引用、软引用、虚引用的区别？
+（扩展题，需对比四类引用）：
+- **强引用**：默认引用，不回收。
+- **软引用**：GC时，内存充足不回收，内存不足才回收（适合缓存）。
+- **弱引用**：GC触发时必回收（适合临时缓存）。
+- **虚引用**：无法通过`get()`获取对象，仅用于跟踪对象被回收的状态（如管理直接内存）。
+
+
+### 5. 为什么`WeakHashMap`的key被回收后，entry会自动删除？
+- `WeakHashMap`的key通过弱引用关联，当key被GC回收后，其对应的entry会被加入一个“引用队列”。
+- `WeakHashMap`在操作（如`get`、`put`）时，会自动清理队列中已回收key对应的entry，因此看起来是“自动删除”。
+
+
+这些问题主要考察对引用类型的基本概念、使用方式及底层原理的理解，需重点掌握弱引用的特性和典型场景。
+
+## 在Java中，强引用和弱引用的主要用途是什么？
+在Java中，强引用和弱引用的设计初衷不同，用途也有明显区别：
+
+
+### 强引用的主要用途
+强引用是Java中最基础、最常用的引用类型，**默认赋值即创建强引用**（如`Object obj = new Object()`），其核心用途是：  
+- **确保对象的存活**：只要强引用存在（未被销毁或置为`null`），被引用的对象就会一直保存在内存中，不会被GC回收，以此保证程序运行时对对象的正常访问。  
+- **支撑程序的核心逻辑**：所有业务逻辑中必须存在的对象（如用户信息、会话数据、正在处理的业务对象等），都通过强引用关联，确保其在使用期间不会被意外回收。  
+
+
+### 弱引用的主要用途
+弱引用需通过`WeakReference`类显式创建（如`WeakReference<Object> weakRef = new WeakReference<>(obj)`），其核心用途是：  
+- **临时缓存非核心数据**：对于一些可用可不用的数据（如缓存的临时计算结果、页面缓存的次要信息），使用弱引用可以让它们在GC触发时被自动回收，既不影响核心逻辑，又能避免内存占用过高导致OOM。  
+- **自动清理无效关联**：典型例子是`WeakHashMap`，其key使用弱引用，当key对应的对象被回收后，`WeakHashMap`会自动移除对应的键值对，无需手动清理，适合存储“随对象生命周期存在”的关联数据。  
+
+
+简单来说，强引用用于“必须保留”的对象，弱引用用于“可临时保留、回收也不影响核心功能”的对象。
+
+## java面试过程中，深浅拷贝会有哪些面试题
+
+在Java面试中，深浅拷贝是考察对象复制机制的常见考点，相关问题主要围绕定义、区别、实现方式及应用场景展开，以下是常见面试题及核心要点：
+
+
+### 1. 什么是深拷贝和浅拷贝？它们的区别是什么？
+- **浅拷贝**：创建一个新对象，新对象的基本数据类型字段与原对象完全相同，但引用类型字段仅复制引用地址（即新对象和原对象的引用字段指向同一个内存地址）。  
+  - 特点：修改新对象的引用类型字段，会影响原对象。
+- **深拷贝**：创建一个新对象，不仅复制基本数据类型字段，还会对引用类型字段进行递归复制（即新对象的引用字段指向一个全新的内存地址，与原对象的引用字段完全独立）。  
+  - 特点：修改新对象的任何字段，都不会影响原对象。
+- **核心区别**：是否对引用类型字段进行“彻底复制”（浅拷贝复制引用，深拷贝复制引用指向的对象）。
+
+
+### 2. 如何实现浅拷贝？
+- 常见方式：让类实现`Cloneable`接口，并重写`Object`类的`clone()`方法（`clone()`方法默认实现浅拷贝）。  
+  示例代码：
+  ```java
+  class Person implements Cloneable {
+      private String name; // 基本类型（包装类）
+      private Address address; // 引用类型
+
+      @Override
+      protected Object clone() throws CloneNotSupportedException {
+          return super.clone(); // 浅拷贝
+      }
+  }
+  ```
+- 注意：`Cloneable`是标记接口，不实现则调用`clone()`会抛出`CloneNotSupportedException`。
+
+
+### 3. 如何实现深拷贝？
+- 常见实现方式：
+  - **递归调用`clone()`**：让引用类型字段也实现`Cloneable`接口并重写`clone()`，在原对象的`clone()`中对引用字段单独调用`clone()`。  
+    示例：
+    ```java
+    class Person implements Cloneable {
+        private Address address;
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            Person clone = (Person) super.clone();
+            clone.address = (Address) this.address.clone(); // 对引用字段深拷贝
+            return clone;
+        }
+    }
+    class Address implements Cloneable {
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+    }
+    ```
+  - **序列化与反序列化**：通过将对象序列化为字节流，再反序列化为新对象（需所有类实现`Serializable`接口）。  
+    示例：
+    ```java
+    // 使用序列化实现深拷贝
+    public static <T> T deepCopy(T obj) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(obj);
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        return (T) ois.readObject();
+    }
+    ```
+
+
+### 4. 浅拷贝可能导致什么问题？
+- 由于浅拷贝的引用类型字段与原对象共享内存，当修改新对象的引用字段时，原对象的对应字段会被同步修改，可能导致不可预期的副作用。  
+  例如：
+  ```java
+  Person p1 = new Person(new Address("北京"));
+  Person p2 = (Person) p1.clone(); // 浅拷贝
+  p2.getAddress().setCity("上海"); // 修改p2的引用字段
+  System.out.println(p1.getAddress().getCity()); // 输出“上海”（原对象被影响）
+  ```
+
+
+### 5. `Object`类的`clone()`方法是深拷贝还是浅拷贝？
+- `Object.clone()`默认实现的是**浅拷贝**，它只会复制对象本身的字段，对于引用类型字段仅复制引用地址，不会递归复制引用指向的对象。
+
+
+这些问题主要考察对深浅拷贝的基本概念、实现方式及潜在问题的理解，需重点掌握两种拷贝的区别和典型实现场景。
+
+## Java常见源码框架中，使用到深浅拷贝的例子
+在Java主流框架中，深浅拷贝的应用场景和实现方式各不相同，以下是常见框架中的典型例子：
+
+
+### 1. **Spring框架**
+#### （1）`BeanUtils.copyProperties`（浅拷贝）
+- **场景**：用于JavaBean属性的批量复制，例如将POJO转换为DTO。
+- **实现方式**：  
+  ```java
+  User source = new User("Alice", new Address("北京"));
+  User target = new User();
+  BeanUtils.copyProperties(source, target); // 浅拷贝
+  ```
+- **特点**：  
+  - 仅复制基本类型和String等不可变类型的字段值，引用类型字段（如`Address`）**仅复制引用地址**，导致源对象和目标对象的引用字段指向同一实例。  
+  - 若需深拷贝，需手动递归复制引用类型字段或使用`SerializationUtils`等工具。
+
+#### （2）`BeanUtils.cloneBean`（深拷贝）
+- **场景**：通过序列化实现深拷贝（需类实现`Serializable`接口）。
+- **实现方式**：  
+  ```java
+  User original = new User("Alice", new Address("北京"));
+  User clone = (User) BeanUtils.cloneBean(original); // 深拷贝
+  ```
+- **原理**：将对象序列化为字节流后反序列化，确保所有引用类型字段独立复制。
+
+
+### 2. **MyBatis框架**
+#### （1）`ResultMap`映射（浅拷贝）
+- **场景**：将数据库查询结果映射为Java对象。
+- **实现方式**：  
+  ```xml
+  <resultMap id="userMap" type="User">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <association property="address" column="address_id" select="selectAddress" />
+  </resultMap>
+  ```
+- **特点**：  
+  - 默认通过反射创建新对象，基本类型字段值复制，引用类型字段（如`address`）**直接引用查询结果**，属于浅拷贝。  
+  - 若需深拷贝，需在映射时手动配置嵌套查询或使用转换器递归复制。
+
+
+### 3. **Hibernate框架**
+#### （1）`merge`方法（状态复制）
+- **场景**：将游离对象的状态同步到持久化上下文。
+- **实现方式**：  
+  ```java
+  User detachedUser = ...; // 游离对象
+  User managedUser = session.merge(detachedUser); // 状态复制
+  ```
+- **特点**：  
+  - 复制游离对象的字段值到持久化对象，引用类型字段**共享内存地址**，属于浅拷贝。  
+  - 若对象包含嵌套实体，需手动配置`CascadeType.ALL`或递归复制以实现深拷贝。
+
+#### （2）快照机制（深拷贝）
+- **场景**：对比对象状态变化以决定是否执行SQL更新。
+- **实现方式**：  
+  通过序列化实现深拷贝，记录对象初始状态：  
+  ```java
+  User original = SnapshotUtils.snapshot(user); // 深拷贝生成快照
+  if (!original.equals(user)) {
+      session.update(user); // 状态变化时更新
+  }
+  ```
+- **原理**：序列化和反序列化确保快照与原对象完全独立，避免引用共享导致的状态污染。
+
+
+### 4. **Java标准库**
+#### （1）`ArrayList.clone()`（浅拷贝）
+- **场景**：复制列表但保留元素引用。
+- **实现方式**：  
+  ```java
+  ArrayList<String> original = new ArrayList<>(Arrays.asList("A", "B"));
+  ArrayList<String> clone = (ArrayList<String>) original.clone(); // 浅拷贝
+  ```
+- **特点**：  
+  - 新列表与原列表共享元素引用，修改元素内容会影响原列表。  
+  - 若元素为可变对象，需手动深拷贝：  
+    ```java
+    List<Person> deepClone = original.stream()
+        .map(Person::clone) // 假设Person实现Cloneable
+        .collect(Collectors.toList());
+    ```
+
+#### （2）`HashMap`与`WeakHashMap`
+- **场景**：`WeakHashMap`的键使用弱引用，当键对象被回收时自动移除条目。
+- **实现方式**：  
+  ```java
+  WeakHashMap<Key, Value> map = new WeakHashMap<>();
+  map.put(new Key(), new Value()); // 键为弱引用
+  ```
+- **特点**：  
+  - 键的弱引用特性避免内存泄漏，但值仍为强引用，需手动处理值的深拷贝需求。
+
+
+### 5. **Apache Commons框架**
+#### （1）`SerializationUtils.clone`（深拷贝）
+- **场景**：通过序列化实现对象深拷贝。
+- **实现方式**：  
+  ```java
+  User original = new User("Alice", new Address("北京"));
+  User clone = SerializationUtils.clone(original); // 深拷贝
+  ```
+- **原理**：将对象序列化为字节流后反序列化，确保所有引用类型字段独立复制（需类实现`Serializable`接口）。
+
+
+### 6. **Google Guava框架**
+#### （1）`Immutable集合`（浅拷贝）
+- **场景**：创建不可变集合时复制元素引用。
+- **实现方式**：  
+  ```java
+  ImmutableList<Person> immutableList = ImmutableList.copyOf(mutableList);
+  ```
+- **特点**：  
+  - 集合本身不可变，但元素仍为原引用，若元素可变需确保其不可变性或手动深拷贝。
+
+
+### 总结
+| 框架/工具               | 深浅拷贝类型       | 典型场景                                                                 |
+|-------------------------|-------------------|--------------------------------------------------------------------------|
+| Spring BeanUtils        | 浅拷贝（默认）    | DTO与领域模型的属性复制，引用类型需手动处理深拷贝                         |
+| MyBatis ResultMap       | 浅拷贝（默认）    | 数据库结果映射，嵌套对象需手动配置深拷贝                                 |
+| Hibernate merge         | 浅拷贝（状态复制）| 游离对象状态同步，嵌套实体需配置级联操作                                 |
+| Apache Commons SerializationUtils | 深拷贝       | 通用深拷贝，通过序列化实现，需类实现Serializable接口                     |
+| Guava Immutable集合     | 浅拷贝（元素引用）| 创建不可变集合，确保集合不可变性，但元素需自行保证不可变性                |
+| ArrayList.clone()       | 浅拷贝            | 列表复制，元素引用共享                                                   |
+
+**核心原则**：  
+- 浅拷贝适用于轻量级对象或引用类型无需独立的场景。  
+- 深拷贝用于需要彻底隔离对象状态的场景，如缓存、快照、跨线程数据传递。  
+- 框架通常提供基础复制功能，复杂场景需结合工具类或手动实现递归复制。
+
+## ThreadLocal在项目内有哪些使用场景？
+
+在项目开发中，`ThreadLocal` 是一种特殊的变量类型，它为每个使用该变量的线程都提供一个独立的变量副本，每个线程都可以独立地改变自己的副本，而不会影响其他线程所对应的副本。以下是 `ThreadLocal` 在项目中的常见使用场景：
+
+### 1. 保存线程上下文信息
+在一个请求的处理流程中，往往需要在多个组件间共享一些上下文信息，例如用户身份、事务ID等。使用 `ThreadLocal` 可以避免在方法调用时显式传递这些参数。
+
+**示例场景**：
+- **用户会话管理**：在Web应用中，将当前登录用户的信息存储在 `ThreadLocal` 中，以便在整个请求处理过程中随时获取。
+- **日志追踪**：为每个请求生成一个唯一的追踪ID，并通过 `ThreadLocal` 传递，方便将整个请求链路的日志关联起来。
+
+### 2. 实现线程安全的单例模式
+某些对象设计为每个线程只能有一个实例，使用 `ThreadLocal` 可以实现线程级别的单例。
+
+**示例代码**：
+```java
+public class ThreadLocalSingleton {
+    private static final ThreadLocal<ThreadLocalSingleton> instance = 
+        ThreadLocal.withInitial(() -> new ThreadLocalSingleton());
+
+    private ThreadLocalSingleton() {}
+
+    public static ThreadLocalSingleton getInstance() {
+        return instance.get();
+    }
+}
+```
+
+### 3. 管理数据库连接或会话
+在多线程环境中使用数据库连接或Hibernate会话时，每个线程需要独立的连接或会话实例，以避免线程安全问题。
+
+**示例代码**：
+```java
+public class ConnectionManager {
+    private static final ThreadLocal<Connection> connectionHolder = 
+        ThreadLocal.withInitial(() -> {
+            try {
+                return DriverManager.getConnection(URL, USER, PASSWORD);
+            } catch (SQLException e) {
+                throw new RuntimeException("获取数据库连接失败", e);
+            }
+        });
+
+    public static Connection getConnection() {
+        return connectionHolder.get();
+    }
+
+    public static void closeConnection() {
+        Connection conn = connectionHolder.get();
+        if (conn != null) {
+            try {
+                conn.close();
+                connectionHolder.remove();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+### 4. 处理跨方法的状态传递
+当某些状态需要在同一个线程的多个方法间共享，但又不想通过方法参数传递时，可以使用 `ThreadLocal`。
+
+**示例场景**：
+- **事务管理**：在Spring框架中，`TransactionSynchronizationManager` 使用 `ThreadLocal` 存储当前事务的状态信息。
+- **权限验证**：在方法调用链中传递用户权限信息，确保整个调用过程中的权限一致性。
+
+### 5. 缓存线程不安全的工具类实例
+某些工具类不是线程安全的（如 `SimpleDateFormat`），但创建它们的实例开销较大。使用 `ThreadLocal` 为每个线程缓存一个实例，可以避免同步问题和重复创建对象。
+
+**示例代码**：
+```java
+public class DateFormatUtil {
+    private static final ThreadLocal<SimpleDateFormat> dateFormatTL = 
+        ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+
+    public static String formatDate(Date date) {
+        return dateFormatTL.get().format(date);
+    }
+
+    public static Date parse(String dateStr) throws ParseException {
+        return dateFormatTL.get().parse(dateStr);
+    }
+}
+```
+
+### 注意事项
+虽然 `ThreadLocal` 很有用，但也存在一些潜在问题：
+- **内存泄漏**：如果 `ThreadLocal` 存储的对象较大，且线程长期存活（如线程池中的线程），可能导致内存泄漏。解决方法是在线程使用完 `ThreadLocal` 后调用 `remove()` 方法。
+- **不可继承性**：`ThreadLocal` 中的值不能被子线程继承。如果需要父子线程间传递数据，可以使用 `InheritableThreadLocal`。
+
+合理使用 `ThreadLocal` 可以简化多线程编程，但需谨慎处理其生命周期，避免引入难以调试的问题。
+

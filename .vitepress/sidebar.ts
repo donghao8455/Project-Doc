@@ -675,6 +675,19 @@ export default {
                 { text: '框架源码', link: '/E_Java面试宝典/框架源码' },
                 { text: '根据简历提问题', link: '/E_Java面试宝典/根据简历提问题' },
                 { text: '管理岗问题', link: '/E_Java面试宝典/管理岗问题' },
+                { text: '开发-架构师', link: '/E_Java面试宝典/开发-架构师' },
+            ]
+        }
+    ],
+    '/E_开发积累-All/': [
+        {
+            text: '开发积累-All',
+            items: [
+                { text: '基本概念', link: '/E_开发积累-All/基本概念' },
+                { text: '后端-MySql', link: '/E_开发积累-All/后端-MySql' },
+                { text: '后端-Nginx', link: '/E_开发积累-All/后端-Nginx' },
+                { text: '项目框架', link: '/E_开发积累-All/项目框架' },
+                { text: '前端', link: '/E_开发积累-All/前端' },
             ]
         }
     ],
