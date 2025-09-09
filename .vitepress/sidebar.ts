@@ -688,6 +688,7 @@ export default {
                 { text: '后端-Nginx', link: '/E_开发积累-All/后端-Nginx' },
                 { text: '项目框架', link: '/E_开发积累-All/项目框架' },
                 { text: '前端', link: '/E_开发积累-All/前端' },
+                { text: '前端', link: '/E_开发积累-All/项目结构重构-实践' },
             ]
         }
     ],
