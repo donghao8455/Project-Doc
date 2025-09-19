@@ -79,3 +79,71 @@
 
 
 总结：`rows`高本身不是问题，但它可能是“潜在性能风险”的信号。需结合索引使用情况、实际执行时间和业务增长预期综合判断，不必为“高rows但当前快”的查询过度优化，但要警惕其长期影响。
+
+## 批量根据主键ID修改SQL，手工拼接
+
+在MyBatis中，如果需要手工拼接SQL实现批量根据主键ID修改，可以使用`foreach`标签来动态生成SQL语句。这种方式适用于需要根据不同ID修改对应字段值的场景。
+
+以下是一个实现示例，假设我们要批量更新用户表的状态和最后修改时间：
+````
+// 对应的Mapper接口
+public interface UserMapper {
+    /**
+     * 批量根据ID更新用户信息
+     * @param userList 包含id和要更新字段的用户列表
+     * @return 影响的行数
+     */
+    int batchUpdateById(List<User> userList);
+}
+    
+<!-- 在Mapper.xml中定义批量更新方法 -->
+<update id="batchUpdateById" parameterType="java.util.List">
+    UPDATE user 
+    SET 
+        status = CASE 
+            <!-- 循环拼接每个ID对应的状态值 -->
+            <foreach collection="list" item="item" separator="">
+                WHEN id = #{item.id} THEN #{item.status}
+            </foreach>
+        END,
+        last_update_time = CASE
+            <!-- 循环拼接每个ID对应的时间值 -->
+            <foreach collection="list" item="item" separator="">
+                WHEN id = #{item.id} THEN #{item.lastUpdateTime}
+            </foreach>
+        END
+    <!-- 限定只更新指定ID的数据 -->
+    WHERE id IN 
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+        #{item.id}
+    </foreach>
+</update>
+````
+
+    
+    
+    
+
+
+### 实现说明：
+
+1. **SQL原理**：
+   - 使用`CASE WHEN`语句结合`foreach`循环，为每个ID指定对应的更新值
+   - 通过`WHERE id IN`限定只更新列表中包含的ID，提高效率
+
+2. **参数说明**：
+   - `collection="list"`表示传入的参数是一个List集合
+   - `item="item"`表示循环中每个元素的别名
+   - `separator`指定循环元素之间的分隔符，这里为空字符串因为我们不需要额外分隔符
+
+3. **使用场景**：
+   - 适用于需要为不同ID设置不同值的批量更新场景
+   - 相比多条UPDATE语句，这种方式只需一次数据库连接，性能更优
+
+4. **注意事项**：
+   - 传入的List不能为空，否则会生成无效SQL
+   - 批量操作有大小限制，建议一次批量操作不超过1000条数据
+   - 如果更新的字段较多，SQL语句会比较长，但性能依然优于多条单独更新
+   - 需要确保所有更新的字段类型与实体类属性类型匹配
+
+这种手工拼接的方式灵活性高，可以根据实际需求调整更新的字段和条件，是MyBatis中实现批量更新的常用方案。
