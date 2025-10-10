@@ -269,12 +269,6 @@ public interface UserMapper {
     </foreach>
 </update>
 ````
-
-    
-    
-    
-
-
 ### 实现说明：
 
 1. **SQL原理**：
@@ -297,3 +291,416 @@ public interface UserMapper {
    - 需要确保所有更新的字段类型与实体类属性类型匹配
 
 这种手工拼接的方式灵活性高，可以根据实际需求调整更新的字段和条件，是MyBatis中实现批量更新的常用方案。
+
+## 常用 SQL 语句大全
+
+### 一.单表查询
+
+#### 1.基础查询
+````
+1.查询所有列
+SELECT
+FROM TableName;
+2.查询特定列
+SELECT Column1, Column2 FROM TableName;
+3.列别名
+SELECT Columni AS name1, Column2 AS name2FROM TableName;
+去重查询
+SELECT DISTINCT Column1 FROM TableName;
+5.限制返回行数
+SELECT
+FROM TableName LIMIT 10;
+6.分页查询
+SELECT
+FROM TableName LIMIT 10 OFFSET 20;
+7.排序查询
+SELECT
+FROM TableName ORDER BY Column1 DESC;
+8.多列排序
+SELECT
+FROM TableName ORDER BY Columni DESC, Column2 ASSC;
+````
+
+#### 2.数据过滤
+````
+
+1.
+基础过滤
+SELECT
+<=,!=,=
+FROM TableName WHERE Columni > value1;-- >,<,>=,
+2.多条件过滤
+SELECT
+value2;
+FROM TableName WHERE Columni > valuei AND OColumn2
+SELECT
+value2;
+FROM TableName WHERE Columni > valuei OR Column2 >
+3.
+范围查询
+SELECT
+value2;
+FROM TableName WHERE Columni BETWEEN value1 AND
+4.IN操作符
+SELECT
+value3);
+FROM TableName WHERE Columni IN (valuei, value2,
+5.
+模糊查询
+SELECT
+SELECT
+SELECT
+FROM TableName WHERE Columni LIKE '%value%:
+FROM TableName WHERE Columni LIKE '%value';
+FROM TableName WHERE Columni LIKE 'value%';
+NULL值判断
+SELECT
+FROM TableName WHERE Columni IS NULL;
+7.
+排除特定值
+SELECT
+FROM TableName WHERE Column1 != value;
+````
+
+
+
+#### 3.聚合函数
+````
+
+1.计算总数
+SELECT COUNT(*) AS cnt
+FROM TableName
+WHERE column1 = value;
+2.
+分组求和
+SELECT columni AS col1,SUM(column2)AS col2
+FROM TableName
+GROUP BY column1;
+分组平均值
+SELECT column1 AS col1,AVG(column2)AS col2
+FROM TableName
+GROUP BY column1;
+4.分组最大值
+SELECT columni AS col1,MAX(column2)AS col2
+FROM TableName
+GROUP BY column1;
+5.分组最小值
+SELECT columni AS col1,MIN(column2)AS col2
+FROM TableName
+GROUP BY column1;
+6.分组筛选(HAVING)
+SELECT columni AS col1,SUM(column2)AS col2
+FROM TableName
+GROUP BY column1
+WHERE column3=value
+HAVING SUM(column2)>value;
+多列分组
+SELECT columni AS coli,columni AS col2, SUM(column3)AScol3
+FROM TableName
+GROUP BY column1,column2;|
+````
+
+#### 4.高级窗口函数
+
+````
+
+1.ROW_NUMBER生成唯一序号
+SELECT column1, column2,
+ROW_NUMBER() OVER (ORDER BY column2) AS row
+FROM TableName;
+2.RANK与DENSE_RANK排名
+SELECT column1, column2,
+RANK() OVER (ORDER BY column2 DESC) AS rank,
+DENSE_RANK() OVER (ORDER BY column2 DESC) ASdense_rank
+FROM TableName;
+3.累计百分比计算
+SELECT column1,column2,
+SUM(column2)OVER (ORDER BY column1) / SUM(columnn2) OVER
+AS cumulative_percent
+FROM TableName;
+4.移动平均(最近三个窗口)
+SELECT column1,column2,
+AVG(column2) OVER (ORDER BY columni ROWS BETTWEEN 2
+PRECEDING AND CURRENT ROW) AS moving_avg
+FROM TableName;
+5.分组内前N名
+SELECT
+FROM (
+SELECT column1,column2,column3,
+ROW_NUMBER() OVER (PARTITION BY columni ORDERBY
+column2 DESC) AS rn
+FROM TableName
+WHERE In <= 3;
+````
+
+### 二.多表查询
+
+#### 1.表连接操作
+````
+1.内连接
+SELECT t1.column1,t2.column2
+FROM Table1 t1
+JOIN Table2 t2
+ON t1.column3 = t2.column3;
+2.左连接
+SELECT t1.column1,t2.column2
+FROM Table1 t1
+LEFTJOINTable2t2
+ON t1.column3 = t2.column3;
+3.右连接
+SELECT t1.column1,t2.column2
+FROM Table1 t1
+RIGHTJOINTable2t2
+ON t1.column3 = t2.column3;
+4.全外连接
+SELECT t1.column1.t2.column2
+FROM Tablei t1
+FULL OUTER JOIN Table2 t2
+ON t1.column3 = t2.column3;
+
+1.全外连接
+SELECT t1.column1,t2.column2
+FROM Tableiti
+FULL OUTER JOIN Table2 t2
+ON t1.column3 = t2.column3;
+5.
+自连接
+SELECT ti.column as columni,t2.column as column2
+FROM Tablei t1
+JOIN Table1 t2
+ON t1.column1=t2.column2;
+6.交叉连接
+SELECT
+FROM Colors CROSS JOIN Sizes;
+
+
+````
+#### 2.子查询
+````
+1.标量子查询
+SELECT columni,(SELECT COUNT(*) FROM TableB WHERE column2
+a.column2)AScnt
+FROM TableA a;
+2.IN子查询
+SELECT column1
+FROM TableA
+WHERE column2 IN (SELECT column2 FROM Categories WHERE Name
+'Electronics'
+3.EXISTS子查询
+SELECT column1
+FROM TableA a
+WHERE EXISTS (SELECT 1 FROM TableB WHEREcolumn2 =
+a.column2)
+4.子查询作为派生表
+SELECT AVG(sum) AS avg
+FROM (SELECT SUM(column2) AS sum FROM TAHLEAGROUP BY
+column1)AS t;
+5.多条件子查询
+SELECT column1, column2
+FROM TableA
+WHERE column2>(SELECT AVG(columm2)FROMTalbleA)
+````
+#### 3.联合查询
+````
+
+1.去重联合
+SELECT columni FROM TableA UNION SELECT Ccolumni FROM TableB
+2.不去重联合
+SELECT columni FROM TableA UNION ALL SELEECT columni FROM
+TableB;
+````
+### 三.常用函数
+
+#### 1.字符串处理
+````
+
+
+1.字符串长度
+SELECTLENGTH(column1) FROM TableName;
+2.字符串截取
+SELECT SUBSTRING(, start,length) FROM TableName;
+3.字符串替换
+SELECT REPLACE(columni,'old_string','new_string')FROM
+TableName;
+4.字符串拼接
+SELECT CONCAT(column1, column2) FROM TableName;
+5.字符串转大写
+SELECT UPPER(column_name) FROM TableName;
+6.字符串转小写
+SELECT LOWER(column_name) FROM TableName
+````
+
+#### 2.时间日期函数
+````
+
+1.当前时间
+SELECT CURTIME();
+2.当前日期
+SELECT CURDATE();
+3.当前日期和时间
+SELECT NOW();
+4.日期向后加天数
+SELECT DATE_ADD(NOW(), INTERVAL 10 DAY);
+5.日期减天数
+SELECT DATE_SUB(NOW(), INTERVAL 10 DAY);
+6.获取两个日期插值
+SELECT DATEDIFF(date1,date2);
+7.获取日期年
+SELECT YEAR(date)FROMTableName;
+8.获取月
+SELECT MONTH(date) FROM TableName;
+9.获取日
+SELECT DAY(date)
+FROM TableName;
+10.获取小时
+SELECT HOUR(time)FROMTableName;
+11.获取分钟
+SELECT MINUTE(time) FROM TableName;
+12.获取秒
+SELECT SECOND(time) FROM TableName;
+13.获取第几周
+SELECT WEEK(time) FROM TableName;
+14.日期转字符串
+SELECT DATE_FORMAT(date, '%Y-%m-%d') FROMTableName;
+15.字符串转日期
+SELECT CAST(column AS DATE) FROM TableName;
+````
+
+
+### 四.常用操作
+#### 1.数据操作
+
+````
+1.插入单条数据
+INSERT INTO TableName (Columni, Column2) VALUES (value1,
+value2);
+2.插入多条数据
+INSERT INTO TableName (Column1, Column2)
+VALUES(value1,value2),(value3,value4);
+3.更新数据
+UPDATE TableName SET Columni = valuei WHERRE Column2
+value2;
+删除数据
+DELETE FROM Orders WHERE OrderDate<'2020-01-01';
+5.全表删除
+DELETE FROM TempData;
+6.清空表数据
+TRUNCATE TABLE Logs;
+
+````
+#### 2.表操作
+````
+1.创建新表
+CREATE TABLE TableName (
+column1 INT PRIMARY KEY,
+column2 VARCHAR(50),
+column13 DATE
+);
+2.添加新列
+ALTER TABLE TableName ADD COLUMN columni INT;
+3.修改列类型
+ALTER TABLE TableName MODIFY COLUMN columni VARCHAR(20);
+4.删除列
+ALTER TABLE TableName DROP COLUMN column1;
+5.重命名表
+ALTER TABLE TableName RENAME TO NewTab1eName:
+6.删除表
+DROP TABLE TableName;
+
+````
+#### 3.约束与索引
+````
+
+1.添加主键约束
+ALTER TABLE TableName ADD PRIMARY KEY (column1);
+2.唯一约束
+ALTER TABLE TableName ADD UNIQUE (column1);
+3.外键约束
+ALTER TABLE TableName
+ADD CONSTRAINT FK_column1
+FOREIGN KEY (columni) REFERENCES TableB(column2);
+创建索引
+CREATE INDEX idx_columni ON TableName (column1);
+5.
+删除索引
+DROP INDEX idx_column1 ON TableName;
+6.
+非空约束
+ALTER TABLE TableName MODIFY COLUMN column1 VARCHAR(100) NOT
+NULL;
+
+
+````
+#### 4.视图
+````
+1.创建视图
+CREATE VIEW ViewName AS
+SELECT column1
+FROM TableName
+WHERE condition;
+2.
+更新视图数据
+UPDATEViewNameSET columni = 'value' WHEREcondition;
+3.
+删除视图
+DROPVIEWIFEXISTSViewName;
+````
+#### 5.事务控制
+````
+
+1.开启事务
+START TRANSACTION;
+2.提交事务
+COMMIT;
+3.
+回滚事务
+ROLLBACK;
+保存点
+SAVEPOINT savepoint1;
+5.回滚到保存点
+ROLLBACK TO savepoint1;
+
+````
+#### 6.权限管理
+````
+1.授予查询权限
+GRANT SELECT ON TableName TO user1;
+2.授予所有权限
+GRANT ALL PRIVILEGES ON DatabaseName." TO
+'admin'@'localhost';
+撤销权限
+REVOKE DELETE ON TableName FROM user2;
+````
+#### 7.其他操作
+````
+
+1.查询所有数据库
+SHOWDATABASES
+2.查询所有表
+SHOW TABLES
+3.查询表结构
+DESCRIBE TableName
+4.查询建表语句
+SHOW CREATE TABLE
+TableName
+5.查询表的所有列
+SELECT COLUMN_NAME
+FROMINFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'database_name' AND TAEBLE_NAME
+'table_name';
+6.查询表的所有索引
+SHOWINDEXFROMTableName;
+7.查询表大小
+SELECT table_name AS 'Table',
+ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 10242)AS'Size
+(MB)
+FROM information_schema.TABLES
+WHERE table_schema = 'database_name';
+8.设置时区--设置亚洲/上海时区
+SET time_zone='Asia/Shanghai';
+9.创建数据库
+CREATE DATABASE database_name;
+10.删除数据库
+DROP DATABASE database_name;
+````
+
