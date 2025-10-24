@@ -676,6 +676,7 @@ export default {
                 { text: '根据简历提问题', link: '/E_Java面试宝典/根据简历提问题' },
                 { text: '管理岗问题', link: '/E_Java面试宝典/管理岗问题' },
                 { text: '开发-架构师', link: '/E_Java面试宝典/开发-架构师' },
+                { text: '场景题', link: '/E_Java面试宝典/场景题' },
             ]
         }
     ],
@@ -689,6 +690,7 @@ export default {
                 { text: '后端-Nginx', link: '/E_开发积累-All/后端-Nginx' },
                 { text: '后端-JVM', link: '/E_开发积累-All/后端-JVM' },
                 { text: '后端-Git', link: '/E_开发积累-All/后端-Git' },
+                { text: '后端-场景题', link: '/E_开发积累-All/后端-场景题' },
                 { text: '项目框架', link: '/E_开发积累-All/项目框架' },
                 { text: '前端', link: '/E_开发积累-All/前端' },
                 { text: '项目结构重构-实践', link: '/E_开发积累-All/项目结构重构-实践' },
