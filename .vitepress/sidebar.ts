@@ -650,6 +650,7 @@ export default {
             items: [
                 { text: '基本概念', link: '/E_Vue项目配置问题/基本概念' },
                 { text: '使用@来替代src文件夹', link: '/E_Vue项目配置问题/使用@来替代src文件夹' },
+                { text: '文献题汇总', link: '/E_Vue项目配置问题/文献题汇总' },
             ]
         }
     ],
