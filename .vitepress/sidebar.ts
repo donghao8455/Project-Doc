@@ -695,12 +695,13 @@ export default {
                 { text: '后端-Nginx', link: '/E_开发积累-All/后端-Nginx' },
                 { text: '后端-JVM', link: '/E_开发积累-All/后端-JVM' },
                 { text: '后端-Git', link: '/E_开发积累-All/后端-Git' },
+                { text: '后端-RocketMQ', link: '/E_开发积累-All/后端-RocketMQ' },
                 { text: '后端-注解', link: '/E_开发积累-All/后端-注解' },
                 { text: '后端-场景题', link: '/E_开发积累-All/后端-场景题' },
                 { text: '项目框架', link: '/E_开发积累-All/项目框架' },
                 { text: '前端', link: '/E_开发积累-All/前端' },
                 { text: '项目结构重构-实践', link: '/E_开发积累-All/项目结构重构-实践' },
-                { text: '项目框架', link: '/E_开发积累-All/项目框架' },
+                { text: 'Markdown', link: '/E_开发积累-All/Markdown' },
             ]
         }
     ],
