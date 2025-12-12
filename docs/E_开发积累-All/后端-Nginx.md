@@ -762,4 +762,156 @@ http {
 
 通过 `upstream` 模块，Nginx可以轻松实现后端服务的负载均衡和高可用，是构建分布式系统的重要组件。
 
+## grep命令还有哪些经典使用场景
 
+`grep` 是 Linux/Unix 系统中最核心的文本搜索工具，功能强大且灵活，除了基础的关键词搜索，还有很多经典实用场景，覆盖日志分析、代码排查、系统管理等多个领域。以下是高频经典使用场景及对应命令：
+
+
+### 一、日志分析与问题排查（最常用）
+日志文件通常体积大、内容多，`grep` 是快速定位问题的核心工具。
+
+#### 1. 搜索日志中的错误信息（关键词过滤）
+```bash
+# 搜索日志中所有包含 "ERROR" 或 "WARN" 的行（不区分大小写）
+grep -iE "error|warn" /var/log/application.log
+
+# 搜索 "Exception" 并显示上下5行上下文（排查异常堆栈）
+grep -C 5 "Exception" /var/log/server.log
+
+# 仅显示匹配行的行号（快速定位日志位置）
+grep -n "Timeout" /var/log/nginx/access.log
+```
+
+#### 2. 按时间范围过滤日志（结合正则）
+假设日志格式包含 `2025-11-26 14:xx:xx` 时间戳，筛选某小时内的日志：
+```bash
+# 匹配 2025-11-26 14:00:00 到 14:59:59 之间的日志
+grep "2025-11-26 14:[0-9][0-9]:" /var/log/app.log
+```
+
+
+### 二、代码/配置文件排查
+开发场景中，快速查找代码中的变量、函数、配置项。
+
+#### 1. 递归搜索代码中的关键词（跨文件/目录）
+```bash
+# 在当前目录及子目录的 .java 文件中，搜索 "userService"（忽略大小写）
+grep -rni --include="*.java" "userService" ./src/
+
+# 排除某些目录（如 target 编译目录）
+grep -rni --exclude-dir="target" "deleteById" ./src/
+
+# 仅显示匹配的文件名（不显示具体内容）
+grep -rl "@Autowired" ./src/main/java/
+```
+
+#### 2. 搜索配置文件中的有效配置（忽略注释和空行）
+```bash
+# 过滤 nginx 配置中，非注释（不以 # 开头）且非空行的有效配置
+grep -vE "^#|^$" /etc/nginx/nginx.conf
+
+# 查找所有启用的端口配置（匹配 "listen [数字]"）
+grep -E "listen [0-9]+" /etc/nginx/conf.d/*.conf
+```
+
+
+### 三、系统管理与进程/服务排查
+结合系统命令（如 `ps`、`netstat`）过滤关键信息。
+
+#### 1. 查找指定进程（替代 `ps aux | grep` 的冗余匹配）
+```bash
+# 查找 java 进程（-v 排除 grep 自身的进程）
+ps aux | grep -v grep | grep java
+
+# 更简洁的写法（使用 -w 精确匹配进程名，避免部分匹配）
+ps aux | grep -w "jenkins"
+```
+
+#### 2. 查找端口占用情况
+```bash
+# 查找 8080 端口的占用进程（结合 netstat/ss）
+netstat -tulpn | grep 8080
+ss -tulpn | grep -w 8080
+```
+
+#### 3. 过滤系统用户或服务状态
+```bash
+# 查找所有已登录的用户（过滤 /etc/passwd 中的系统用户）
+grep -E "/bin/bash|/bin/zsh" /etc/passwd
+
+# 检查所有已启用的 systemd 服务
+systemctl list-unit-files | grep -E "enabled|static"
+```
+
+
+### 四、文本处理与数据筛选
+结合管道（`|`）和其他命令（如 `sort`、`uniq`）处理文本数据。
+
+#### 1. 统计关键词出现次数（去重/总计）
+```bash
+# 统计日志中 "ERROR" 出现的总行数
+grep -c "ERROR" /var/log/app.log
+
+# 统计每个 IP 访问次数（结合 nginx 日志，提取 IP 后去重计数）
+grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" /var/log/nginx/access.log | sort | uniq -c | sort -nr
+```
+
+#### 2. 提取文件中的特定内容（正则匹配）
+```bash
+# 从文本中提取所有邮箱地址（简单正则）
+grep -Eo "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" data.txt
+
+# 提取所有 URL（匹配 http/https 开头的链接）
+grep -Eo "https?://[^\s]+" log.txt
+```
+
+#### 3. 对比文件差异（筛选共同/不同内容）
+```bash
+# 查找两个文件中相同的行
+grep -Ff file1.txt file2.txt
+
+# 查找 file1 中有但 file2 中没有的行
+grep -vxFf file2.txt file1.txt
+```
+
+
+### 五、高级场景：正则表达式深度使用
+`grep` 支持基础正则（BRE）和扩展正则（ERE，用 `-E` 启用），处理复杂匹配。
+
+#### 1. 匹配特定格式的字符串
+```bash
+# 匹配手机号（11位数字，以 13/14/15/17/18 开头）
+grep -Eo "1[34578][0-9]{9}" data.txt
+
+# 匹配日期格式（YYYY-MM-DD）
+grep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" dates.txt
+```
+
+#### 2. 匹配多行内容（结合 `pcregrep`，需安装）
+`grep` 默认单行匹配，若需匹配跨多行的内容，用 `pcregrep`（支持 Perl 兼容正则）：
+```bash
+# 匹配以 "Start" 开头、以 "End" 结尾的多行内容
+pcregrep -M "Start.*\n.*End" file.txt
+```
+
+
+### 核心参数总结（高频必记）
+| 参数 | 作用 |
+|------|------|
+| `-i` | 忽略大小写 |
+| `-r` | 递归搜索子目录 |
+| `-n` | 显示匹配行的行号 |
+| `-c` | 统计匹配的总行数 |
+| `-l` | 仅显示包含匹配内容的文件名 |
+| `-v` | 反向匹配（显示不包含关键词的行） |
+| `-C N` | 显示匹配行上下 N 行上下文 |
+| `-E` | 启用扩展正则（无需转义 `|` `()` 等符号） |
+| `-o` | 仅显示匹配的部分（而非整行） |
+| `--include/--exclude` | 筛选/排除特定文件类型 |
+
+
+### 总结
+`grep` 的核心价值是“快速文本过滤”，通过结合正则、管道、递归等特性，可适配日志分析、代码排查、系统管理等绝大多数文本处理场景。熟练掌握上述场景后，能极大提升 Linux 环境下的工作效率。
+
+
+## 
