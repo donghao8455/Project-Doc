@@ -703,4 +703,79 @@ CREATE DATABASE database_name;
 10.删除数据库
 DROP DATABASE database_name;
 ````
+## MySQL 字符集排序规则（Collation）核心知识点
+
+## MySQL 字符集排序规则（Collation）核心知识点
+### 1. 基础概念（是什么）
+- **字符集（Charset）**：定义字符的编码方式（如 `utf8mb4` 是支持4字节UTF-8的字符集，能存储emoji等特殊字符）。
+- **排序规则（Collation）**：基于字符集的**排序/比较规则**，后缀含义：
+  - `_ci`：case insensitive（大小写不敏感），如 `A` 和 `a` 视为相等；
+  - `_cs`：case sensitive（大小写敏感）；
+  - `_bin`：二进制比较（严格按ASCII码值比较，`A`≠`a`）；
+  - `_unicode_ci`：基于Unicode标准排序，精度高；
+  - `_general_ci`：通用排序，速度快但精度低（早期常用，现已不推荐）。
+- **层级关系**：数据库 > 表 > 字段（下层未指定时继承上层默认值）。
+
+### 2. 排序规则不匹配的触发原因（为什么会报错）
+- **核心逻辑**：MySQL 不允许在**不同排序规则**的字符串字段间直接执行等值比较（`=`）、连接（`JOIN`）、排序（`ORDER BY`）等操作。
+- **常见场景**：
+  1. 两张表的关联字段（如案例中 `executor_address` 和 `registry_value`）分别设置了 `utf8mb4_unicode_ci` 和 `utf8mb4_general_ci`；
+  2. 手动修改某张表/字段的排序规则，但未同步关联表；
+  3. 数据库默认排序规则与表/字段不一致，新建表时未显式指定。
+
+### 3. 影响与表现（报错特征）
+- **典型报错**：`Illegal mix of collations (xxx_ci,IMPLICIT) and (yyy_ci,IMPLICIT) for operation '='`；
+- **影响范围**：
+  - SQL 执行失败（如案例中XXL-Job的监控线程报错）；
+  - 即使不报错，也可能导致索引失效（隐式转换），查询性能下降；
+  - 比较结果不符合预期（如大小写判断错误）。
+
+### 4. 解决方案（怎么解决/预防）
+| 方案类型       | 具体操作                                                                 | 适用场景                     |
+|----------------|--------------------------------------------------------------------------|------------------------------|
+| 根源解决（推荐） | 统一关联字段/表/数据库的排序规则（优先 `utf8mb4_unicode_ci`）：<br>`ALTER TABLE 表名 MODIFY COLUMN 字段名 VARCHAR(长度) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;` | 生产环境，可修改表结构       |
+| 临时应急       | SQL 中显式指定排序规则：<br>`字段1 COLLATE utf8mb4_unicode_ci = 字段2 COLLATE utf8mb4_unicode_ci` | 无法修改表结构（如只读库）   |
+| 提前预防       | 1. 数据库级统一默认排序规则：<br>`CREATE DATABASE 库名 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`<br>2. 新建表时显式指定排序规则 | 新项目/新建表                |
+
+### 记忆口诀（简化核心）
+```
+排序规则看后缀，ci不敏bin严格；
+关联比较要统一，unicode优先选；
+改字段或改SQL，预防先把规则定。
+```
+
+### 总结
+1. 排序规则是字符集的“比较规则”，不同规则的字段直接比较会触发MySQL报错；
+2. 核心解决方案是**统一排序规则**（优先 `utf8mb4_unicode_ci`），临时方案是SQL中显式指定；
+3. 最佳实践是从数据库层级统一排序规则，避免后续出现关联字段不匹配问题。
+
+这个知识点的核心是“一致性”——只要保证参与比较/关联的字符串字段排序规则一致，就能彻底避免这类报错，记住这一点就能应对绝大多数场景。
+
+### 方案：在 SQL 中临时指定排序规则（应急）
+如果暂时无法修改表结构，可以修改 MyBatis 映射文件中的 SQL，在比较时显式指定排序规则：
+
+```xml
+<!-- 修改 XxlJobLogMapper.xml 中的 findLostJobIds 对应的 SQL -->
+SELECT    
+  t.id   
+FROM    
+  xxl_job_log_t t    
+  LEFT JOIN xxl_job_registry t2 
+  ON t.executor_address COLLATE utf8mb4_unicode_ci = t2.registry_value COLLATE utf8mb4_unicode_ci   
+WHERE    
+  t.trigger_code = 200     
+  AND t.handle_code = 0     
+  AND t.trigger_time   <=   ?     
+  AND t2.id IS NULL;
+```
+
+
+
+
+
+
+
+
+
+
 
