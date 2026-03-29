@@ -689,6 +689,186 @@ spring:
 
 
 
+## 🚀 MongoDB 常用语句大全（超级完整版 · 直接复制用）
+
+### 一、查询（find）最常用
+#### 1. 基础查询（所有字段）
+```js
+db.集合名.find({ "字段": "值" })
+```
+
+#### 2. 多条件 AND 查询（最常用）
+```js
+db.集合名.find({
+  "airline": "TR",
+  "status": 1,
+  "isDeleted": 0
+})
+```
+
+#### 3. IN 查询（多个值匹配）
+```js
+db.集合名.find({
+  "airline": { $in: ["VA", "JQ", "TR"] }
+})
+```
+
+#### 4. NOT IN 查询
+```js
+db.集合名.find({
+  "airline": { $nin: ["TR"] }
+})
+```
+
+#### 5. 大于 / 小于 / 大于等于 / 小于等于
+```js
+db.集合名.find({
+  "depDate": { $gt: "2026-03-20" },     // 大于
+  "depDate": { $gte: "2026-03-20" },    // 大于等于
+  "depDate": { $lt: "2026-03-20" },     // 小于
+  "depDate": { $lte: "2026-03-20" }     // 小于等于
+})
+```
+
+#### 6. 不等于
+```js
+db.集合名.find({ "status": { $ne: 0 } })
+```
+
+#### 7. 模糊查询（包含）
+```js
+db.集合名.find({ "flightNo": { $regex: "897" } })
+```
+
+#### 8. 查询指定字段（不返回全部）
+```js
+db.集合名.find(
+  { "airline": "TR" }, 
+  { "flightNo": 1, "dep": 1, "arr": 1, "_id": 0 }  // 1显示 0隐藏
+)
+```
+
+#### 9. 分页 + 排序
+```js
+db.集合名.find()
+  .sort({ "createTime": -1 })  // -1降序 1升序
+  .skip(0)
+  .limit(1000)
+```
+
+#### 10. 查询所有（无限制）
+```js
+db.集合名.find().limit(0)
+```
+
+---
+
+### 二、统计数量
+```js
+db.集合名.countDocuments({ "airline": "TR" })
+```
+
+---
+
+### 三、修改（update）
+#### 1. 批量修改（推荐）
+```js
+db.集合名.updateMany(
+  { "airline": "TR" },
+  { $set: { "createUser": "S", "updateUser": "U" } }
+)
+```
+
+#### 2. 只修改一条
+```js
+db.集合名.updateOne(
+  { "airline": "TR" },
+  { $set: { "status": 2 } }
+)
+```
+
+---
+
+### 四、分组统计（aggregate 最常用）
+#### 1. 单字段分组统计条数
+```js
+db.集合名.aggregate([
+  { $match: { "airline": "TR" } },
+  { $group: { _id: "$dep", count: { $sum: 1 } } },
+  { $sort: { count: -1 } }
+], { allowDiskUse: true })
+```
+
+#### 2. 多字段分组（你最常用）
+```js
+db.集合名.aggregate([
+  { $match: { "airline": "TR" } },
+  {
+    $group: {
+      _id: { dep: "$dep", arr: "$arr", flightNo: "$flightNo" },
+      count: { $sum: 1 }
+    }
+  }
+], { allowDiskUse: true })
+```
+
+#### 3. 分组 + 显示完整数据（去重取一条）
+```js
+db.集合名.aggregate([
+  { $match: { "airline": "TR" } },
+  { $group: { _id: "$dep", doc: { $first: "$$ROOT" } } },
+  { $replaceRoot: { newRoot: "$doc" } }
+], { allowDiskUse: true })
+```
+
+---
+
+### 五、去重查询
+```js
+db.集合名.distinct("dep", { "airline": "TR" })
+```
+
+---
+
+### 六、删除（谨慎使用）
+#### 1. 按条件删除
+```js
+db.集合名.deleteMany({ "airline": "TR" })
+```
+
+#### 2. 删除一条
+```js
+db.集合名.deleteOne({ "_id": ObjectId("xxx") })
+```
+
+---
+
+### 七、你业务高频组合（直接背这几个）
+#### ✅ 组合1：多条件 + IN + 日期范围
+```js
+db.集合名.find({
+  "airline": { $in: ["VA", "JQ"] },
+  "status": 1,
+  "isDeleted": 0,
+  "depDate": { $gte: "2026-03-01", $lte: "2026-03-31" }
+})
+```
+
+#### ✅ 组合2：分组统计（你最常用）
+```js
+db.集合名.aggregate([
+  { $match: { "airline": "TR", "isDeleted": 0 } },
+  { $group: { _id: { dep: "$dep", arr: "$arr" }, count: { $sum:1 } } }
+], { allowDiskUse: true })
+```
+
+#### ✅ 组合3：批量更新
+```js
+db.集合名.updateMany(
+  { "airline": "TR" },
+  { $set: { "createUser": "S", "updateUser": "U" } }
+)
+```
 
 
 
