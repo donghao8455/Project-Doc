@@ -690,6 +690,8 @@ export default {
             text: '开发积累-All',
             items: [
                 { text: '基本概念', link: '/E_开发积累-All/基本概念' },
+                { text: '项目框架', link: '/E_开发积累-All/项目框架' },
+                { text: '前端', link: '/E_开发积累-All/前端' },
                 { text: '后端-Spring', link: '/E_开发积累-All/后端-Spring' },
                 { text: '后端-MySql', link: '/E_开发积累-All/后端-MySql' },
                 { text: '后端-MongonDB', link: '/E_开发积累-All/后端-MongonDB' },
@@ -703,8 +705,7 @@ export default {
                 { text: '后端-RocketMQ', link: '/E_开发积累-All/后端-RocketMQ' },
                 { text: '后端-注解', link: '/E_开发积累-All/后端-注解' },
                 { text: '后端-场景题', link: '/E_开发积累-All/后端-场景题' },
-                { text: '项目框架', link: '/E_开发积累-All/项目框架' },
-                { text: '前端', link: '/E_开发积累-All/前端' },
+                { text: '服务器-FTP', link: '/E_开发积累-All/服务器-FTP' },
                 { text: '项目结构重构-实践', link: '/E_开发积累-All/项目结构重构-实践' },
                 { text: 'Markdown', link: '/E_开发积累-All/Markdown' },
             ]
