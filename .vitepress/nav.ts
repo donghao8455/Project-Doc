@@ -68,6 +68,12 @@ export default [
         ]
     },
     { 
+        text: 'AI大模型开发',
+        items: [
+            { text: 'AI大模型开发', link: '/F_AI大模型开发/AI大模型开发' },
+        ]
+    },
+    { 
         text: '经验积累',
         items: [
             { text: 'Java后端学习规划', link: '/E_Java后端学习规划/Java后端学习规划' },

@@ -782,6 +782,40 @@ export default {
         }
     ],
 
+    /**
+     * AI大模型开发部分
+     */
+    '/F_AI大模型开发/': [
+        {
+            text: 'AI大模型开发',
+            items: [
+                { text: 'AI大模型开发', link: '/F_AI大模型开发/AI大模型开发' },
+                { text: '基本概念', link: '/F_AI大模型开发/基本概念' },
+                { text: 'API调用', link: '/F_AI大模型开发/API调用' },
+                { text: 'Prompt工程', link: '/F_AI大模型开发/Prompt工程' },
+                { text: 'Token与定价', link: '/F_AI大模型开发/Token与定价' },
+            ]
+        },
+        {
+            text: 'RAG知识库',
+            items: [
+                { text: 'RAG概述', link: '/F_AI大模型开发/RAG知识库/RAG概述' },
+                { text: '向量数据库', link: '/F_AI大模型开发/RAG知识库/向量数据库' },
+                { text: '文档处理', link: '/F_AI大模型开发/RAG知识库/文档处理' },
+                { text: '检索优化', link: '/F_AI大模型开发/RAG知识库/检索优化' },
+            ]
+        },
+        {
+            text: 'AI Agent',
+            items: [
+                { text: 'Agent概述', link: '/F_AI大模型开发/AI Agent/Agent概述' },
+                { text: '工具调用', link: '/F_AI大模型开发/AI Agent/工具调用' },
+                { text: '记忆管理', link: '/F_AI大模型开发/AI Agent/记忆管理' },
+                { text: '多Agent协作', link: '/F_AI大模型开发/AI Agent/多Agent协作' },
+            ]
+        }
+    ],
+
     // '/P_communicate/': [
     //     {
     //         text: 'communicate',
