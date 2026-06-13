@@ -816,6 +816,46 @@ export default {
         }
     ],
 
+    /**
+     * AI大模型面试部分
+     */
+    '/E_AI大模型应用面试/': [
+        {
+            text: '总体方案',
+            items: [
+                { text: '面试突击方案', link: '/E_AI大模型应用面试/01_面试突击方案' },
+            ]
+        },
+        {
+            text: '基础理论',
+            items: [
+                { text: 'LLM基础理论', link: '/E_AI大模型应用面试/02_LLM基础理论' },
+                { text: 'Prompt工程与优化', link: '/E_AI大模型应用面试/03_Prompt工程与优化' },
+            ]
+        },
+        {
+            text: '核心应用',
+            items: [
+                { text: 'RAG架构与实现', link: '/E_AI大模型应用面试/04_RAG架构与实现' },
+                { text: 'Agent开发与框架', link: '/E_AI大模型应用面试/05_Agent开发与框架' },
+                { text: '向量数据库与检索', link: '/E_AI大模型应用面试/08_向量数据库与检索' },
+            ]
+        },
+        {
+            text: '进阶技术',
+            items: [
+                { text: '模型微调技术', link: '/E_AI大模型应用面试/06_模型微调技术' },
+                { text: '推理优化与部署', link: '/E_AI大模型应用面试/07_推理优化与部署' },
+            ]
+        },
+        {
+            text: '工程化与实战',
+            items: [
+                { text: '工程化与场景设计', link: '/E_AI大模型应用面试/09_工程化与场景设计' },
+            ]
+        }
+    ],
+
     // '/P_communicate/': [
     //     {
     //         text: 'communicate',
