@@ -64,25 +64,25 @@ import gitee from '../images/gitee.svg'
 </script>
 
 <style>
-/* ============ 颜色类（使用 CSS 变量，兼容明暗模式） ============ */
+/* ============ 颜色类：暗黑霓虹配色 ============ */
 .color-pink {
-    background: linear-gradient(135deg, #70c5d3 0%, #5aa8b5 100%);
+    background: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
 }
 
 .color-red {
-    background: linear-gradient(135deg, #b91d47 0%, #8e1535 100%);
+    background: linear-gradient(135deg, #ec4899 0%, #9d174d 100%);
 }
 
 .color-blue-deep {
-    background: linear-gradient(135deg, #3360a3 0%, #244578 100%);
+    background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
 }
 
 .color-blue {
-    background: linear-gradient(135deg, #2db7f5 0%, #1d93c9 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
 }
 
 .color-ai {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
 }
 
 /* ============ 主容器 ============ */
@@ -135,7 +135,7 @@ import gitee from '../images/gitee.svg'
 
 .ui-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 32px rgba(34, 211, 238, 0.18), 0 0 0 1px rgba(34, 211, 238, 0.25);
     border-color: var(--vp-c-brand-1);
 }
 
@@ -200,14 +200,16 @@ import gitee from '../images/gitee.svg'
 }
 
 .btn-primary {
-    background: var(--vp-c-brand-1);
-    color: #fff;
-    font-weight: 500;
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    color: #04121a;
+    font-weight: 600;
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--vp-c-brand-2);
-    color: #fff;
+    background: linear-gradient(135deg, #22d3ee, #6366f1);
+    color: #04121a;
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.55);
 }
 
 .btn-ghost {
