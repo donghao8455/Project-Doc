@@ -64,25 +64,25 @@ import gitee from '../images/gitee.svg'
 </script>
 
 <style>
-/* ============ 颜色类（使用 CSS 变量，兼容明暗模式） ============ */
+/* ============ 颜色类：Matrix 荧光绿梯度 ============ */
 .color-pink {
-    background: linear-gradient(135deg, #70c5d3 0%, #5aa8b5 100%);
+    background: linear-gradient(135deg, #00ff41 0%, #00802a 100%);
 }
 
 .color-red {
-    background: linear-gradient(135deg, #b91d47 0%, #8e1535 100%);
+    background: linear-gradient(135deg, #00cc35 0%, #00591b 100%);
 }
 
 .color-blue-deep {
-    background: linear-gradient(135deg, #3360a3 0%, #244578 100%);
+    background: linear-gradient(135deg, #66ff99 0%, #00b332 100%);
 }
 
 .color-blue {
-    background: linear-gradient(135deg, #2db7f5 0%, #1d93c9 100%);
+    background: linear-gradient(135deg, #00e63a 0%, #007a22 100%);
 }
 
 .color-ai {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    background: linear-gradient(135deg, #aaffc0 0%, #00cc35 100%);
 }
 
 /* ============ 主容器 ============ */
@@ -135,7 +135,7 @@ import gitee from '../images/gitee.svg'
 
 .ui-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 32px rgba(0, 255, 65, 0.18), 0 0 0 1px rgba(0, 255, 65, 0.3);
     border-color: var(--vp-c-brand-1);
 }
 
@@ -201,25 +201,29 @@ import gitee from '../images/gitee.svg'
 
 .btn-primary {
     background: var(--vp-c-brand-1);
-    color: #fff;
-    font-weight: 500;
+    color: #010402;
+    font-family: Consolas, monospace;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(0, 255, 65, 0.4);
 }
 
 .btn-primary:hover {
     background: var(--vp-c-brand-2);
-    color: #fff;
+    color: #010402;
+    box-shadow: 0 0 24px rgba(0, 255, 65, 0.65);
 }
 
 .btn-ghost {
     background: transparent;
-    color: var(--vp-c-text-2);
-    border-color: var(--vp-c-divider);
+    color: var(--vp-c-brand-1);
+    border-color: rgba(0, 255, 65, 0.4);
+    font-family: Consolas, monospace;
 }
 
 .btn-ghost:hover {
-    background: var(--vp-c-bg-alt);
-    color: var(--vp-c-text-1);
-    border-color: var(--vp-c-divider);
+    background: rgba(0, 255, 65, 0.12);
+    color: var(--vp-c-brand-1);
+    border-color: var(--vp-c-brand-1);
 }
 
 .btn-group {

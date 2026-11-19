@@ -8,6 +8,8 @@ export default defineConfig({
   description: "分享个人的开发学习文档",
   srcDir: "./docs/",
   // base: '/Project-Doc/',
+  // Matrix 主题：强制深色，保证代码雨/CRT效果一致
+  appearance: 'force-dark',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.svg',

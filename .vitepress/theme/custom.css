@@ -1,4 +1,153 @@
-/* 调整 hero 头像的位置和大小 */
+/* ============================================================
+   黑客帝国 Matrix 主题：代码雨 + CRT 扫描线 + 荧光绿终端风
+   ============================================================ */
+
+/* ---------- 1. 全局变量：荧光绿体系 ---------- */
+:root {
+    --mx-green: #00ff41;
+    --mx-green-soft: #7ee887;
+    --mx-green-dim: rgba(0, 255, 65, 0.6);
+    --mx-bg: #010402;
+    --vp-c-brand-1: #00ff41;
+    --vp-c-brand-2: #00cc35;
+    --vp-c-brand-3: #009928;
+    --vp-c-brand-soft: rgba(0, 255, 65, 0.16);
+}
+
+.dark {
+    --vp-c-bg: #010402;
+    --vp-c-bg-alt: #020a04;
+    --vp-c-bg-soft: #030d06;
+    --vp-c-bg-elv: #04120a;
+    --vp-c-divider: rgba(0, 255, 65, 0.2);
+    --vp-c-gutter: #010402;
+
+    --vp-c-text-1: #d0ffd8;
+    --vp-c-text-2: rgba(160, 240, 175, 0.78);
+    --vp-c-text-3: rgba(120, 200, 135, 0.55);
+
+    --vp-c-brand-1: #00ff41;
+    --vp-c-brand-2: #66ff99;
+    --vp-c-brand-3: #00cc35;
+    --vp-c-brand-soft: rgba(0, 255, 65, 0.18);
+
+    --vp-code-bg: #010803;
+    --vp-code-block-bg: #010803;
+
+    /* Hero 标题荧光绿（官方变量，防 scoped 覆盖） */
+    --vp-home-hero-name-color: #00ff41;
+    --vp-home-hero-text-color: #a8ffb0;
+}
+
+/* ---------- 2. 代码雨画布层 ---------- */
+.matrix-rain {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.matrix-rain canvas {
+    display: block;
+}
+
+.dark #app {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- 3. CRT 扫描线 + 暗角 ---------- */
+.dark body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+        radial-gradient(ellipse 120% 100% at 50% 40%, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+/* 屏幕绿光氛围 */
+.dark body {
+    background: radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0, 255, 65, 0.06), transparent 60%), #010402;
+}
+
+/* 轻微 CRT 闪烁 */
+@keyframes crt-flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.94; }
+    94% { opacity: 1; }
+    97% { opacity: 0.97; }
+    98% { opacity: 1; }
+}
+
+.dark #app {
+    animation: crt-flicker 7s infinite;
+}
+
+/* ---------- 4. 导航栏：黑底荧光绿 ---------- */
+.dark .VPNavBar {
+    position: relative;
+    background: rgba(1, 4, 2, 0.82) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 255, 65, 0.35);
+}
+
+.dark .VPNavBar::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.9), transparent);
+    box-shadow: 0 0 12px rgba(0, 255, 65, 0.7);
+    pointer-events: none;
+}
+
+.dark .VPNavBarTitle .title {
+    font-family: Consolas, 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #00ff41;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+}
+
+.dark .VPSidebar {
+    background: rgba(1, 8, 3, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(0, 255, 65, 0.18);
+}
+
+.dark .VPSidebarItem.is-active > .item .link .text {
+    color: #00ff41;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.55);
+}
+
+/* ---------- 5. Hero 区：终端风 ---------- */
+.dark .VPHero .name,
+.dark .VPHero .text {
+    font-family: Consolas, 'Courier New', monospace;
+}
+
+.dark .VPHero .name .clip {
+    text-shadow:
+        0 0 8px rgba(0, 255, 65, 0.85),
+        0 0 26px rgba(0, 255, 65, 0.5),
+        0 0 64px rgba(0, 255, 65, 0.32);
+}
+
+/* 副标题加终端提示符 */
+.dark .VPHero .text::before {
+    content: '> ';
+    color: #00ff41;
+    font-weight: 700;
+}
+
+/* 头像：绿色辉光 + 数字方框感 */
 .VPHomeHero .image-container {
     margin-top: 40px;
 }
@@ -7,32 +156,297 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .VPHomeHero .image {
+    border: 1px solid rgba(0, 255, 65, 0.7);
+    box-shadow: 0 0 34px rgba(0, 255, 65, 0.55), 0 0 80px rgba(0, 255, 65, 0.22);
 }
 
 .VPHomeHero .image:hover {
-    transform: scale(1.1);
+    transform: scale(1.06);
 }
 
-
-/* 调整 features 信息框的大小 */
-.VPHomeFeatures .container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+.dark .VPHomeHero .image:hover {
+    box-shadow: 0 0 52px rgba(0, 255, 65, 0.8), 0 0 110px rgba(0, 255, 65, 0.35);
 }
 
-.VPHomeFeatures .item {
-    flex: 1 1 30%;
-    margin: 10px;
-    padding: 10px;
+/* 按钮：终端实心绿 / 描边绿 */
+.dark .VPButton.brand {
+    background: #00ff41 !important;
+    border-color: #00ff41 !important;
+    color: #010402 !important;
+    font-family: Consolas, monospace;
+    font-weight: 700;
+    text-shadow: none;
+    box-shadow: 0 0 22px rgba(0, 255, 65, 0.45);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.dark .VPButton.brand:hover {
+    box-shadow: 0 0 36px rgba(0, 255, 65, 0.8);
+    transform: translateY(-1px);
+}
+
+.dark .VPButton.alt {
+    background: rgba(0, 255, 65, 0.06);
+    border: 1px solid rgba(0, 255, 65, 0.5);
+    color: #00ff41 !important;
+    font-family: Consolas, monospace;
+}
+
+.dark .VPButton.alt:hover {
+    background: rgba(0, 255, 65, 0.16);
+    border-color: #00ff41;
+    box-shadow: 0 0 18px rgba(0, 255, 65, 0.4);
+}
+
+/* ---------- 6. Features 卡片：绿玻璃终端面板 ---------- */
+.dark .VPFeature {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(4, 22, 10, 0.88), rgba(1, 8, 3, 0.92));
+    border: 1px solid rgba(0, 255, 65, 0.32) !important;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), inset 0 0 22px rgba(0, 255, 65, 0.05);
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.18s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 顶部荧光光条 */
+.dark .VPFeature::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff41, transparent);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+/* hover 扫光 */
+.dark .VPFeature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 42%, rgba(0, 255, 65, 0.16) 50%, transparent 58%);
+    transform: translateX(-100%);
+    transition: transform 0.7s ease;
+}
+
+.dark .VPFeature:hover::after {
+    transform: translateX(100%);
+}
+
+.dark .VPFeature:hover {
+    border-color: #00ff41 !important;
+    box-shadow: 0 0 0 1px rgba(0, 255, 65, 0.4), 0 16px 48px rgba(0, 255, 65, 0.28);
+}
+
+.dark .VPFeature .icon {
+    font-size: 32px;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.6));
+}
+
+.dark .VPFeature .title {
+    font-family: Consolas, 'Courier New', monospace;
+    color: #00ff41;
+    letter-spacing: 0.5px;
+}
+
+.dark .VPFeature .title::before {
+    content: '[';
+    color: rgba(0, 255, 65, 0.55);
+    margin-right: 4px;
+}
+
+.dark .VPFeature .title::after {
+    content: ']';
+    color: rgba(0, 255, 65, 0.55);
+    margin-left: 4px;
+}
+
+.dark .VPFeature .icon,
+.dark .VPFeature .title,
+.dark .VPFeature .details {
+    transform: translateZ(24px);
+}
+
+/* ---------- 7. 代码块：绿色终端框 ---------- */
+.dark div[class*='language-'] {
+    border: 1px solid rgba(0, 255, 65, 0.3);
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+    box-shadow: 0 0 22px rgba(0, 255, 65, 0.08), inset 0 0 30px rgba(0, 255, 65, 0.03);
 }
 
-.VPHomeFeatures .item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    cursor: default;
+.dark div[class*='language-'] > span.lang {
+    color: #00ff41;
+    font-family: Consolas, monospace;
+}
+
+.dark div[class*='language-']::before {
+    content: 'root@matrix:~$';
+    position: absolute;
+    top: 8px;
+    left: 56px;
+    z-index: 2;
+    color: rgba(0, 255, 65, 0.45);
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+/* ---------- 8. 正文：终端标题 / 引用 / 表格 ---------- */
+.dark .vp-doc h1,
+.dark .vp-doc h2,
+.dark .vp-doc h3 {
+    font-family: Consolas, 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+.dark .vp-doc h1 {
+    color: #00ff41;
+    text-shadow: 0 0 14px rgba(0, 255, 65, 0.45);
+}
+
+.dark .vp-doc h2 {
+    border-top-color: rgba(0, 255, 65, 0.22);
+    padding-left: 16px;
+    position: relative;
+}
+
+.dark .vp-doc h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 4px;
+    height: 22px;
+    border-radius: 2px;
+    background: #00ff41;
+    box-shadow: 0 0 12px rgba(0, 255, 65, 0.85);
+}
+
+.dark .vp-doc blockquote {
+    border-left: 3px solid #00ff41;
+    background: rgba(0, 255, 65, 0.06);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-family: Consolas, monospace;
+}
+
+.dark .vp-doc th {
+    background: rgba(0, 255, 65, 0.1);
+    font-family: Consolas, monospace;
+}
+
+.dark .vp-doc tr:nth-child(2n) {
+    background: rgba(0, 255, 65, 0.04);
+}
+
+.dark .vp-doc table {
+    border-color: rgba(0, 255, 65, 0.25);
+}
+
+/* ---------- 9. 滚动条 ---------- */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #010402;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 65, 0.35);
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 65, 0.65);
+}
+
+/* ---------- 10. 搜索框 ---------- */
+.dark .DocSearch-Button,
+.dark .VPNavBarSearch .DocSearch-Button {
+    background: rgba(0, 255, 65, 0.06);
+    border: 1px solid rgba(0, 255, 65, 0.28);
+    font-family: Consolas, monospace;
+}
+
+/* ---------- 11. 标题打字机光标 ---------- */
+.dark .VPHero .name .clip.typing-cursor {
+    display: inline-block;
+}
+
+.dark .VPHero .name .clip.typing-cursor::after {
+    content: '';
+    display: inline-block;
+    width: 0.55em;
+    height: 0.9em;
+    margin-left: 6px;
+    background: #00ff41;
+    box-shadow: 0 0 14px #00ff41;
+    vertical-align: -0.08em;
+    animation: mx-blink 1s step-end infinite;
+}
+
+@keyframes mx-blink {
+    50% { opacity: 0; }
+}
+
+/* ---------- 12. 页脚霓虹分割线 ---------- */
+.dark .VPFooter {
+    position: relative;
+    border-top: none;
+}
+
+.dark .VPFooter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff41, transparent);
+    box-shadow: 0 0 16px rgba(0, 255, 65, 0.65);
+    pointer-events: none;
+}
+
+.dark .VPDocFooter {
+    position: relative;
+}
+
+.dark .VPDocFooter::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.6), transparent);
+    pointer-events: none;
+}
+
+/* ---------- 13. 尊重"减少动效"偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .matrix-rain {
+        display: none;
+    }
+
+    .dark #app {
+        animation: none;
+    }
+
+    .dark .VPHero .name .clip.typing-cursor::after {
+        animation: none;
+    }
 }
